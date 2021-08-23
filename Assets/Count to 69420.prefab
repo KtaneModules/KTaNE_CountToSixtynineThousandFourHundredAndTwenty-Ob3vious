@@ -2519,7 +2519,8 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1846698370693070}
-  m_Text: "<b>ONLINE-3</b>\n\n Arizona...\n>Decater...\n Lasagna..."
+  m_Text: "<b>ONLINE-3</b>\n\n <color='#3F3FBF'>Obvious</color>\n><color='#577D26'>meh</color>\n
+    <color='#002ABA'>Lord Kabe..</color>"
   m_OffsetZ: 0
   m_CharacterSize: 0.0008
   m_LineSpacing: 1
@@ -2561,13 +2562,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1025657291388670}
-  m_Text: '3265
-
-    3266
-
-    3267
-
-'
+  m_Text: "6941\n6942\n   0\n"
   m_OffsetZ: 0
   m_CharacterSize: 0.0008
   m_LineSpacing: 1

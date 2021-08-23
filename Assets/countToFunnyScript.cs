@@ -22,9 +22,9 @@ public class countToFunnyScript : MonoBehaviour
     private List<int> numbers = new List<int> { };
     private List<int> users;
     private List<int> selected = new List<int> { };
-    private readonly List<string> usernames = new List<string> { "Arizona Ranger", "Decateron Shanpe", "SolidPepper", "Protogen God", "Lasagna Lover", "Lasagna Hater", "Hyperboloid", "worst expert ever :(", "Cyberpunk Tesla", "Left-Wing Media Agent", "Big Thonker", "what", "Kanye Not East", "Atlanta", "void" };
-    private readonly List<string> hex = new List<string> { "002ABA", "3F3FbF", "EAEBEC", "F0D149", "3F3FbF", "EAEBEC", "EAEBEC", "577D26", "607D8B", "FF8AFF", "ff0000", "ff0000", "002ABA", "F0D149", "000000" };
-    private readonly List<int> pings = new List<int> { 234, 136, 614, 731, 633, 366, 394, 243, 998, 407, 818, 956, 808, 864, -1 };
+    private readonly List<string> usernames = new List<string> { "Lord Kabewm", "Obvious", "GhostSalt", "Rdzanu", "MásQuéÉlite", "AnAverageArceus", "BomberJack", "meh", "Danielstigman", "Danny7007", "Asmir", "Eltrick", "Shadow Meow", "Cooldoom5" };
+    private readonly List<string> hex = new List<string> { "002ABA", "3F3FBF", "EAEBEC", "FFC000", "7700FF", "F0D149", "00BFBA", "577D26", "1F1E33", "FF8AFF", "00FFFF", "308BBE", "9400D3", "000000" };
+    private readonly List<int> pings = new List<int> { 234, 136, 614, 731, 633, 366, 394, 243, 998, 407, 818, 956, 808, -1 };
     private int input;
 
     //logging
@@ -56,12 +56,12 @@ public class countToFunnyScript : MonoBehaviour
                     }
                     if (!solved)
                     {
-                        Text[0].text = numbers.Join("\n") + "\n" + input;
-                        Text[1].text = "<b>ONLINE-3</b>\n\n" + users.Select(y => (y == users[selected[numbers.Count()]] ? ">" : " ") + "<color='#" + hex[y] + "'>" + usernames[y].Substring(0, new int[] { 8, usernames[y].Length }.Min()) + (usernames[y].Length > 8 ? "..." : "") + "</color>").Join("\n");
+                        Text[0].text = numbers.Select(y => y == 0 ? "   0" : y.ToString()).Join("\n") + "\n" + Enumerable.Repeat(" ", 4 - input.ToString().Length).Join("") + input;
+                        Text[1].text = "<b>ONLINE-3</b>\n\n" + users.Select(y => (y == users[selected[numbers.Count()]] ? ">" : " ") + "<color='#" + hex[y] + "'>" + usernames[y].Substring(0, new int[] { 9, usernames[y].Length }.Min()) + (usernames[y].Length > 9 ? ".." : "") + "</color>").Join("\n");
                     }
                     else
                     {
-                        Text[0].text = numbers.Join("\n") + "\n<color='#00ff00'>Poggers!</color>";
+                        Text[0].text = numbers.Select(y => y == 0 ? "   0" : y.ToString()).Join("\n") + "\n<color='#00ff00'>Poggers!</color>";
                         Text[1].text = "<b>ONLINE-0</b>";
                     }
                 }
@@ -73,8 +73,8 @@ public class countToFunnyScript : MonoBehaviour
     void Start()
     {
         GenerateSolution();
-        Text[0].text = numbers.First() + "\n0";
-        Text[1].text = "<b>ONLINE-3</b>\n\n" + users.Select(x => (x == users[selected[1]] ? ">" : " ") + "<color='#" + hex[x] + "'>" + usernames[x].Substring(0, new int[] { 8, usernames[x].Length }.Min()) + (usernames[x].Length > 8 ? "..." : "") + "</color>").Join("\n");
+        Text[0].text = numbers.First() + "\n   0";
+        Text[1].text = "<b>ONLINE-3</b>\n\n" + users.Select(x => (x == users[selected[1]] ? ">" : " ") + "<color='#" + hex[x] + "'>" + usernames[x].Substring(0, new int[] { 9, usernames[x].Length }.Min()) + (usernames[x].Length > 9 ? ".." : "") + "</color>").Join("\n");
     }
 
     private void GenerateSolution()
@@ -83,7 +83,7 @@ public class countToFunnyScript : MonoBehaviour
         solution = new List<int> { };
         numbers = new List<int> { };
         selected = new List<int> { };
-        int n = Rnd.Range(1000, 5000);
+        int n = Rnd.Range(1000, 10000);
         numbers.Add(n);
         solution.Add(n);
         selected.Add(-1);
@@ -93,10 +93,8 @@ public class countToFunnyScript : MonoBehaviour
         for (int i = 0; i < 5; i++)
         {
             selected.Add(Rnd.Range(0, 3));
-            if (users[selected.Last()] == 14)
-            {
+            if (users[selected.Last()] == 13)
                 solution.Add(0);
-            }
             else
             {
                 while (solution.Count() < selected.Count())
@@ -117,7 +115,7 @@ public class countToFunnyScript : MonoBehaviour
                     {
                         //less pog
                         for (int j = 0; j < 3; j++)
-                            if (latest[j] != n - 1 && !Likes(users[j], n + 1) && users[j] != 14)
+                            if (latest[j] != n - 1 && !Likes(users[j], n + 1) && users[j] != 13)
                                 candidates.Add(j);
                         if (candidates.Count() >= 1)
                         {
@@ -130,7 +128,7 @@ public class countToFunnyScript : MonoBehaviour
                         {
                             //unpog
                             for (int j = 0; j < 3; j++)
-                                if (latest[j] != n - 1 && users[j] != 14)
+                                if (latest[j] != n - 1 && users[j] != 13)
                                     candidates.Add(j);
                             latest[candidates.OrderBy(x => n % pings[users[x]]).First()] = n;
                             if (candidates.OrderBy(x => n % pings[users[x]]).First() == selected.Last())
@@ -144,6 +142,11 @@ public class countToFunnyScript : MonoBehaviour
         if(n >= 10000)
         {
             Debug.LogFormat("[Count to 69420 #{0}] The number crossed 10000, which is great, but not supported :(", _moduleID);
+            goto regen;
+        }
+        else if (n - numbers.First() > 100)
+        {
+            Debug.LogFormat("[Count to 69420 #{0}] We got more than 100 numbers further, which is great, but let's have some mercy on the player", _moduleID);
             goto regen;
         }
         Debug.LogFormat("[Count to 69420 #{0}] Answers are: {1}.", _moduleID, solution.First() + "; " + Enumerable.Range(1, 5).Select(x => usernames[users[selected[x]]] + ": " + solution[x]).Join("; "));
@@ -175,56 +178,71 @@ public class countToFunnyScript : MonoBehaviour
         }
     }
 
-    private bool IsPrime(int n)
+    private int DistinctPrimeCount(int n)
     {
-        bool good = true;
-        for (int i = 2; i < n && good; i++)
+        int j = 0;
+        for (int i = 2; i <= n; i++)
             if (n % i == 0)
-                good = false;
+            {
+                j++;
+                while (n % i == 0)
+                    n /= i;
+            }
+        return j;
+    }
+
+    private bool IsPower(int n)
+    {
+        bool good = false;
+        for (int i = 2; i * i <= n; i++)
+            for (int j = 1; j <= n; j *= i)
+                good |= j == n;
         return good;
     }
 
-    private bool IsSquare(int n)
+    private int TernaryTwos(int n)
     {
-        bool good = false;
-        for (int i = 0; i * i <= n; i++)
-            good = i * i == n;
-        return good;
+        int i = 0;
+        while (n > 0)
+        {
+            if (n % 3 == 2)
+                i++;
+            n /= 3;
+        }
+        return i;
     }
 
     private bool Likes(int user, int n)
     {
         switch (user)
         {
-            case 0:
-                return (n % 2 == 0);
-            case 1:
+            case 0: //Kabewm
+                return (((n + 8) % 9) % 2 == 1);
+            case 1: //Obvi
                 return (n % 2 == 1);
-            case 2:
-                return (new int[] { 6, 9 }.Contains(n % 10));
-            case 3:
-                return (IsPrime(n));
-            case 4:
-                return (n % 5 != 0);
-            case 5:
-                return (n % 5 == 0);
-            case 6:
-                return (n.ToString()[0] == n.ToString()[3] && n.ToString()[1] == n.ToString()[2]);
-            case 7:
-                return (IsSquare(n));
-            case 8:
-                return (!n.ToString().Contains('0'));
-            case 9:
-                return (new int[] { 1234, 2345, 3456, 4567, 5678, 6789 }.Contains(n));
-            case 10:
-                return (n.ToString().Contains('0') && n.ToString().Contains('5'));
-            case 11:
-                return (!(n.ToString().Contains('0') || n.ToString().Contains('3') || n.ToString().Contains('6') || n.ToString().Contains('9')));
-            case 12:
-                return (!(n.ToString().Contains('7') || n.ToString().Contains('8') || n.ToString().Contains('9')));
-            case 13:
-                return (n % 51 == 0);
-            case 14:
+            case 2: //Ghost
+                return (n % 16 >= 8);
+            case 3: //zanu
+                return (n.ToString().Count(x => "47".Contains(x)) % 2 == 1);
+            case 4: //MasQue
+                return (TernaryTwos(n) % 2 == 0);
+            case 5: //Arc
+                return (DistinctPrimeCount(n) % 2 == 1);
+            case 6: //Jack
+                return (n.ToString().Distinct().Count() <= 2);
+            case 7: //meh
+                return (IsPower(n));
+            case 8: //Dan
+                return (n.ToString().All(x => "02468".Contains(x)) || n.ToString().All(x => "13579".Contains(x)));
+            case 9: //Danny
+                return (Math.Abs(n.ToString()[0] - n.ToString()[1]) == Math.Abs(n.ToString()[2] - n.ToString()[3]));
+            case 10: //Asmir
+                return (Enumerable.Range(0, 4).All(x => x % 2 != (n.ToString()[x] - '0') / 5) || Enumerable.Range(0, 4).All(x => x % 2 == (n.ToString()[x] - '0') / 5));
+            case 11: //Eltrick
+                return (n.ToString().Count(x => "069".Contains(x)) % 2 == 0);
+            case 12: //Shadow
+                return (n % 10 == 7 || n % 7 == 0);
+            case 13: //void
                 return false;
         }
         return false;
