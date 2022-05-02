@@ -194,6 +194,12 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 102272224824641212, guid: de2e4123af215ea49b37fc2645f8ec0f,
+        type: 2}
+      propertyPath: m_Text
+      value: "<b>ONLINE-3</b>\n\n <color='#9080c0'>Obvious</color>\n><color='#577D26'>meh</color>\n
+        <color='#002ABA'>Lord Kabe..</color>"
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: de2e4123af215ea49b37fc2645f8ec0f, type: 2}
   m_IsPrefabParent: 0

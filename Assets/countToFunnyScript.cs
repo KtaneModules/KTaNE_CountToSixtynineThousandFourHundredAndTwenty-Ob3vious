@@ -22,8 +22,8 @@ public class countToFunnyScript : MonoBehaviour
     private List<int> numbers = new List<int> { };
     private List<int> users;
     private List<int> selected = new List<int> { };
-    private readonly List<string> usernames = new List<string> { "Lord Kabewm", "Obvious", "GhostSalt", "Rdzanu", "MásQuéÉlite", "AnAverageArceus", "BomberJack", "meh", "Danielstigman", "Danny7007", "Asmir", "Eltrick", "Shadow Meow", "Cooldoom5" };
-    private readonly List<string> hex = new List<string> { "002ABA", "3F3FBF", "EAEBEC", "FFC000", "7700FF", "F0D149", "00BFBA", "577D26", "1F1E33", "FF8AFF", "00FFFF", "308BBE", "9400D3", "000000" };
+    private readonly List<string> usernames = new List<string> { "Lord Kabewm", "Obvious", "GhostSalt", "Rdzanu", "MásQuéÉlite", "AnAverageArceus", "BomberJack", "meh", "Danielstigman", "tandyCake", "Asmir", "Eltrick", "Shadow Meow", "Cooldoom5" };
+    private readonly List<string> hex = new List<string> { "002ABA", "9080c0", "EAEBEC", "FFC000", "7700FF", "F0D149", "00BFBA", "577D26", "1F1E33", "FF8AFF", "00FFFF", "308BBE", "9400D3", "000000" };
     private readonly List<int> pings = new List<int> { 234, 136, 614, 731, 633, 366, 394, 243, 998, 407, 818, 956, 808, -1 };
     private int input;
 
@@ -144,7 +144,7 @@ public class countToFunnyScript : MonoBehaviour
             Debug.LogFormat("[Count to 69420 #{0}] The number crossed 10000, which is great, but not supported :(", _moduleID);
             goto regen;
         }
-        else if (n - numbers.First() > 100)
+        else if (n - numbers.First() > 25)
         {
             Debug.LogFormat("[Count to 69420 #{0}] We got more than 100 numbers further, which is great, but let's have some mercy on the player", _moduleID);
             goto regen;
@@ -279,17 +279,16 @@ public class countToFunnyScript : MonoBehaviour
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        yield return true;
         while (!solved)
         {
             string cmd = solution[numbers.Count()].ToString("0000");
             for (int i = 0; i < 4; i++)
             {
                 Buttons[cmd[i] - '0'].OnInteract();
-                yield return true;
+                yield return new WaitForSeconds(0.1f);
             }
             Buttons[10].OnInteract();
-            yield return true;
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }
