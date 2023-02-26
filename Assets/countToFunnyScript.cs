@@ -123,7 +123,7 @@ public class CountToFunnyScript : MonoBehaviour
             _numbers = new List<int> { };
             _selected = new List<int> { };
 
-            int n = Rnd.Range(10, 10000);
+            int n = Rnd.Range(10, 69420);
 
             _numbers.Add(n);
             _solution.Add(n);
