@@ -7,8 +7,26 @@ using KModkit;
 using Rnd = UnityEngine.Random;
 using System.Text.RegularExpressions;
 
-public class countToFunnyScript : MonoBehaviour
+public class CountToFunnyScript : MonoBehaviour
 {
+    private struct User
+    {
+        public string Name { get; private set; }
+        public string HexCode { get; private set; }
+        public int Ping { get; private set; }
+        public Preference Likes { get; private set; }
+
+        public User(string name, string hexCode, int ping, Preference likes)
+        {
+            Name = name;
+            HexCode = hexCode;
+            Ping = ping;
+            Likes = likes;
+        }
+
+        public delegate bool Preference(int number);
+    }
+
 
     //public stuff
     public KMAudio Audio;
@@ -17,14 +35,34 @@ public class countToFunnyScript : MonoBehaviour
     public KMBombModule Module;
 
     //private stuff
-    private bool solved;
-    private List<int> solution = new List<int> { };
-    private List<int> numbers = new List<int> { };
-    private List<int> users;
-    private List<int> selected = new List<int> { };
-    private readonly List<string> usernames = new List<string> { "Lord Kabewm", "Obvious", "GhostSalt", "Rdzanu", "MásQuéÉlite", "AnAverageArceus", "BomberJack", "meh", "Danielstigman", "tandyCake", "Asmir", "Eltrick", "Shadow Meow", "Cooldoom5" };
-    private readonly List<string> hex = new List<string> { "002ABA", "9080c0", "EAEBEC", "FFC000", "7700FF", "F0D149", "00BFBA", "577D26", "1F1E33", "FF8AFF", "00FFFF", "308BBE", "9400D3", "000000" };
-    private readonly List<int> pings = new List<int> { 234, 136, 614, 731, 633, 366, 394, 243, 998, 407, 818, 956, 808, -1 };
+    private bool _solved;
+    private List<int> _solution = new List<int> { };
+    private List<int> _numbers = new List<int> { };
+    private List<int> _selected = new List<int> { };
+
+    private List<User> _chosenUsers;
+
+
+    private static readonly User[] _users =
+    {
+        new User("Rdzanu", "FFC000", 731, number => number.ToString().Count(x => "47".Contains(x)) % 2 == 1),
+        new User("AnAverageArceus", "F0D149", 366, number => DistinctPrimeCount(number) % 2 == 1),
+        new User("meh", "577D26", 243, number => IsPerfectPower(number)),
+        new User("BomberJack", "00BFBA", 394, number => number.ToString().Distinct().Count() <= 2),
+        new User("Asmir", "00FFFF", 818, number => Enumerable.Range(0, number.ToString().Length - 1).All(x => LowHighParityOdd(number.ToString(), x, x + 1))),
+        new User("Eltrick", "308BBE", 956, number => number.ToString().Count(x => "069".Contains(x)) % 2 == 0),
+        new User("gwendolyn", "0080FF", 597, number => Enumerable.Range(0, number.ToString().Length).Any(x => IsStrictlyAscending(RemoveDigit(number.ToString(), x)))),
+        new User("GhostSalt", "EAEBEC", 614, number => number % 16 >= 8),
+        new User("Lord Kabewm", "002ABA", 234, number => ((number + 8) % 9 + 1) % 2 == 0),
+        new User("Cooldoom5", "000001", 248, number => IsDecomposableInto(number.ToString(), LucasNumbersUpTo(number).Select(x => x.ToString()).ToArray())),
+        new User("Danielstigman", "1F1E33", 727, number => number.ToString().All(x => number.ToString().All(y => y % 2 == x % 2))),
+        new User("Obvious", "9080C0", 383, number => number % 2 == 1),
+        new User("MásQuéÉlite", "7700FF", 633, number => BaseDigitCount(number, 3, 2) % 2 == 0),
+        new User("Shadow Meow", "9400D3", 808, number => number % 10 == 7 || number % 7 == 0),
+        new User("tandyCake", "FF8AFF", 407, number => DigitDifference(number.ToString(), 0, 1) == DigitDifference(number.ToString(), number.ToString().Length - 2, number.ToString().Length - 1)),
+        new User("Dicey", "ff40D0", 679, number => number % 3 == 0),
+    };
+
     private int input;
 
     //logging
@@ -37,11 +75,11 @@ public class countToFunnyScript : MonoBehaviour
         for (int i = 0; i < 11; i++)
         {
             int x = i;
-            Buttons[i].OnHighlight += delegate { if (!solved) { Buttons[x].GetComponent<MeshRenderer>().material.color = new Color32(52, 57, 62, 255); } };
-            Buttons[i].OnHighlightEnded += delegate { Buttons[x].GetComponent<MeshRenderer>().material.color = new Color32(44, 47, 51, 255); };
+            Buttons[i].OnHighlight += delegate { if (!_solved) { Buttons[x].GetComponent<MeshRenderer>().material.color = new Color32(64, 66, 73, 255); } };
+            Buttons[i].OnHighlightEnded += delegate { Buttons[x].GetComponent<MeshRenderer>().material.color = new Color32(49, 51, 56, 255); };
             Buttons[i].OnInteract += delegate
             {
-                if (!solved)
+                if (!_solved)
                 {
                     Audio.PlaySoundAtTransform("Tap", Module.transform);
                     if (x == 10)
@@ -52,16 +90,16 @@ public class countToFunnyScript : MonoBehaviour
                     {
                         input *= 10;
                         input += x;
-                        input %= 10000;
+                        input %= 100000;
                     }
-                    if (!solved)
+                    if (!_solved)
                     {
-                        Text[0].text = numbers.Select(y => y == 0 ? "   0" : y.ToString()).Join("\n") + "\n" + Enumerable.Repeat(" ", 4 - input.ToString().Length).Join("") + input;
-                        Text[1].text = "<b>ONLINE-3</b>\n\n" + users.Select(y => (y == users[selected[numbers.Count()]] ? ">" : " ") + "<color='#" + hex[y] + "'>" + usernames[y].Substring(0, new int[] { 9, usernames[y].Length }.Min()) + (usernames[y].Length > 9 ? ".." : "") + "</color>").Join("\n");
+                        Text[0].text = _numbers.Select(y => y == 0 ? "    0" : Enumerable.Repeat(" ", 5 - y.ToString().Length).Join("") + y.ToString()).Join("\n") + "\n" + Enumerable.Repeat(" ", 5 - input.ToString().Length).Join("") + input;
+                        Text[1].text = "<b>ONLINE-3</b>\n\n" + _chosenUsers.Select(y => (y.Name == _chosenUsers[_selected[_numbers.Count()]].Name ? ">" : " ") + "<color='#" + y.HexCode + "'>" + y.Name.Substring(0, new int[] { 9, y.Name.Length }.Min()) + (y.Name.Length > 9 ? ".." : "") + "</color>").Join("\n");
                     }
                     else
                     {
-                        Text[0].text = numbers.Select(y => y == 0 ? "   0" : y.ToString()).Join("\n") + "\n<color='#00ff00'>Poggers!</color>";
+                        Text[0].text = _numbers.Select(y => y == 0 ? "    0" : Enumerable.Repeat(" ", 5 - y.ToString().Length).Join("") + y.ToString()).Join("\n") + "\n<color='#" + (_solution.Any(y => y.ToString().Contains("727")) ? "135A8F" : "60E060") + "'>" + (_solution.Any(y => y.ToString().Contains("727")) ? "WYSI" : "Poggers!") + "</color>";
                         Text[1].text = "<b>ONLINE-0</b>";
                     }
                 }
@@ -73,112 +111,111 @@ public class countToFunnyScript : MonoBehaviour
     void Start()
     {
         GenerateSolution();
-        Text[0].text = numbers.First() + "\n   0";
-        Text[1].text = "<b>ONLINE-3</b>\n\n" + users.Select(x => (x == users[selected[1]] ? ">" : " ") + "<color='#" + hex[x] + "'>" + usernames[x].Substring(0, new int[] { 9, usernames[x].Length }.Min()) + (usernames[x].Length > 9 ? ".." : "") + "</color>").Join("\n");
+        Text[0].text = Enumerable.Repeat(" ", 5 - _numbers.First().ToString().Length).Join("") + _numbers.First();
+        Text[1].text = "<b>ONLINE-3</b>\n\n" + _chosenUsers.Select(x => (x.Name == _chosenUsers[_selected[1]].Name ? ">" : " ") + "<color='#" + x.HexCode + "'>" + x.Name.Substring(0, new int[] { 9, x.Name.Length }.Min()) + (x.Name.Length > 9 ? ".." : "") + "</color>").Join("\n");
     }
 
     private void GenerateSolution()
     {
-        regen:
-        solution = new List<int> { };
-        numbers = new List<int> { };
-        selected = new List<int> { };
-        int n = Rnd.Range(1000, 10000);
-        numbers.Add(n);
-        solution.Add(n);
-        selected.Add(-1);
-        users = Enumerable.Range(0, usernames.Count()).ToList().Shuffle().Take(3).ToList();
-        Debug.LogFormat("[Count to 69420 #{0}] Online: {1}.", _moduleID, users.Select(x => usernames[x]).Join(", "));
-        List<int> latest = new List<int> { 0, 0, 0 };
-        for (int i = 0; i < 5; i++)
+        while (true)
         {
-            selected.Add(Rnd.Range(0, 3));
-            if (users[selected.Last()] == 13)
-                solution.Add(0);
-            else
+            _solution = new List<int> { };
+            _numbers = new List<int> { };
+            _selected = new List<int> { };
+
+            int n = Rnd.Range(10, 10000);
+
+            _numbers.Add(n);
+            _solution.Add(n);
+            _selected.Add(-1);
+
+            _chosenUsers = _users.ToList().Shuffle().Take(3).ToList();
+            Debug.LogFormat("[Count to 69420 #{0}] Online: {1}.", _moduleID, _chosenUsers.Select(x => x.Name).Join(", "));
+
+            List<int> latest = new List<int> { 0, 0, 0 };
+            for (int i = 0; i < 5; i++)
             {
-                while (solution.Count() < selected.Count())
+                _selected.Add(Rnd.Range(0, 3));
+                while (_solution.Count() < _selected.Count())
                 {
                     n++;
                     List<int> candidates = new List<int> { };
                     for (int j = 0; j < 3; j++)
-                        if (latest[j] != n - 1 && Likes(users[j], n))
+                        if (latest[j] != n - 1 && _chosenUsers[j].Likes(n))
                             candidates.Add(j);
                     if (candidates.Count() >= 1)
                     {
-                        //pog
-                        latest[candidates.OrderBy(x => n % pings[users[x]]).First()] = n;
-                        if (candidates.OrderBy(x => n % pings[users[x]]).First() == selected.Last())
-                            solution.Add(n);
+                        latest[candidates.OrderBy(x => n % _chosenUsers[x].Ping).First()] = n;
+                        if (candidates.OrderBy(x => n % _chosenUsers[x].Ping).First() == _selected.Last())
+                            _solution.Add(n);
                     }
                     else
                     {
-                        //less pog
                         for (int j = 0; j < 3; j++)
-                            if (latest[j] != n - 1 && !Likes(users[j], n + 1) && users[j] != 13)
+                            if (latest[j] != n - 1 && !_chosenUsers[j].Likes(n + 1))
                                 candidates.Add(j);
                         if (candidates.Count() >= 1)
                         {
-                            //still pog
-                            latest[candidates.OrderBy(x => n % pings[users[x]]).First()] = n;
-                            if (candidates.OrderBy(x => n % pings[users[x]]).First() == selected.Last())
-                                solution.Add(n);
+                            latest[candidates.OrderBy(x => n % _chosenUsers[x].Ping).First()] = n;
+                            if (candidates.OrderBy(x => n % _chosenUsers[x].Ping).First() == _selected.Last())
+                                _solution.Add(n);
                         }
                         else
                         {
-                            //unpog
                             for (int j = 0; j < 3; j++)
-                                if (latest[j] != n - 1 && users[j] != 13)
+                                if (latest[j] != n - 1)
                                     candidates.Add(j);
-                            latest[candidates.OrderBy(x => n % pings[users[x]]).First()] = n;
-                            if (candidates.OrderBy(x => n % pings[users[x]]).First() == selected.Last())
-                                solution.Add(n);
+                            latest[candidates.OrderBy(x => n % _chosenUsers[x].Ping).First()] = n;
+                            if (candidates.OrderBy(x => n % _chosenUsers[x].Ping).First() == _selected.Last())
+                                _solution.Add(n);
                         }
                     }
-                    Debug.LogFormat("[Count to 69420 #{0}] {1}", _moduleID, (solution.Contains(n) ? "!!! " : "") + usernames[users[latest.IndexOf(n)]] + ": " + n);
+                    Debug.LogFormat("[Count to 69420 #{0}] {1}", _moduleID, (_solution.Contains(n) ? "!!! " : "") + _chosenUsers[latest.IndexOf(n)].Name + ": " + n);
                 }
             }
+            if (n > 69420)
+            {
+                Debug.LogFormat("[Count to 69420 #{0}] The number crossed 69420, which is amazing, but we don't have to count further do we?", _moduleID);
+                continue;
+            }
+            if (n - _numbers.First() > 25)
+            {
+                Debug.LogFormat("[Count to 69420 #{0}] We got more than 25 numbers further, which is great, but let's have some mercy on the player", _moduleID);
+                continue;
+            }
+
+            Debug.LogFormat("[Count to 69420 #{0}] Answers are: {1}.", _moduleID, _solution.First() + "; " + Enumerable.Range(1, 5).Select(x => _chosenUsers[_selected[x]].Name + ": " + _solution[x]).Join("; "));
+            break;
         }
-        if(n >= 10000)
-        {
-            Debug.LogFormat("[Count to 69420 #{0}] The number crossed 10000, which is great, but not supported :(", _moduleID);
-            goto regen;
-        }
-        else if (n - numbers.First() > 25)
-        {
-            Debug.LogFormat("[Count to 69420 #{0}] We got more than 100 numbers further, which is great, but let's have some mercy on the player", _moduleID);
-            goto regen;
-        }
-        Debug.LogFormat("[Count to 69420 #{0}] Answers are: {1}.", _moduleID, solution.First() + "; " + Enumerable.Range(1, 5).Select(x => usernames[users[selected[x]]] + ": " + solution[x]).Join("; "));
     }
 
     private void CheckSolve()
     {
-        if (solution[numbers.Count()] == input)
+        if (_solution[_numbers.Count()] == input)
         {
             Debug.LogFormat("[Count to 69420 #{0}] You submitted {1}, which is correct!", _moduleID, input);
-            numbers.Add(input);
+            _numbers.Add(input);
             input = 0;
         }
         else
         {
-            Debug.LogFormat("[Count to 69420 #{0}] You submitted {1} but I expected {2}. Your message will be deleted, but you will still get a strike!", _moduleID, input, solution[numbers.Count()]);
+            Debug.LogFormat("[Count to 69420 #{0}] You submitted {1} but I expected {2}. Your message will be deleted, but you will still get a strike!", _moduleID, input, _solution[_numbers.Count()]);
             Module.HandleStrike();
         }
-        if (numbers.Count() == solution.Count())
+        if (_numbers.Count() == _solution.Count())
         {
             Debug.LogFormat("[Count to 69420 #{0}] Module solved!", _moduleID);
             Module.HandlePass();
-            solved = true;
+            _solved = true;
             foreach (var button in Buttons)
             {
-                button.GetComponent<MeshRenderer>().material.color = new Color32(44, 47, 51, 255);
+                button.GetComponent<MeshRenderer>().material.color = new Color32(49, 51, 56, 255);
                 button.GetComponentInChildren<TextMesh>().text = "";
             }
         }
     }
 
-    private int DistinctPrimeCount(int n)
+    private static int DistinctPrimeCount(int n)
     {
         int j = 0;
         for (int i = 2; i <= n; i++)
@@ -191,7 +228,7 @@ public class countToFunnyScript : MonoBehaviour
         return j;
     }
 
-    private bool IsPower(int n)
+    private static bool IsPerfectPower(int n)
     {
         bool good = false;
         for (int i = 2; i * i <= n; i++)
@@ -200,52 +237,85 @@ public class countToFunnyScript : MonoBehaviour
         return good;
     }
 
-    private int TernaryTwos(int n)
+    private static int BaseDigitCount(int n, int b, int d)
     {
         int i = 0;
         while (n > 0)
         {
-            if (n % 3 == 2)
+            if (n % b == d)
                 i++;
-            n /= 3;
+            n /= b;
         }
         return i;
     }
 
-    private bool Likes(int user, int n)
+    private static int DigitDifference(string n, int a, int b)
     {
-        switch (user)
-        {
-            case 0: //Kabewm
-                return (((n + 8) % 9) % 2 == 1);
-            case 1: //Obvi
-                return (n % 2 == 1);
-            case 2: //Ghost
-                return (n % 16 >= 8);
-            case 3: //zanu
-                return (n.ToString().Count(x => "47".Contains(x)) % 2 == 1);
-            case 4: //MasQue
-                return (TernaryTwos(n) % 2 == 0);
-            case 5: //Arc
-                return (DistinctPrimeCount(n) % 2 == 1);
-            case 6: //Jack
-                return (n.ToString().Distinct().Count() <= 2);
-            case 7: //meh
-                return (IsPower(n));
-            case 8: //Dan
-                return (n.ToString().All(x => "02468".Contains(x)) || n.ToString().All(x => "13579".Contains(x)));
-            case 9: //Danny
-                return (Math.Abs(n.ToString()[0] - n.ToString()[1]) == Math.Abs(n.ToString()[2] - n.ToString()[3]));
-            case 10: //Asmir
-                return (Enumerable.Range(0, 4).All(x => x % 2 != (n.ToString()[x] - '0') / 5) || Enumerable.Range(0, 4).All(x => x % 2 == (n.ToString()[x] - '0') / 5));
-            case 11: //Eltrick
-                return (n.ToString().Count(x => "069".Contains(x)) % 2 == 0);
-            case 12: //Shadow
-                return (n % 10 == 7 || n % 7 == 0);
-            case 13: //void
+        return Math.Abs(n[a] - n[b]);
+    }
+
+    private static bool LowHighParityOdd(string n, int a, int b)
+    {
+        return (n[a] < '5') ^ (n[b] < '5');
+    }
+
+    private static bool IsStrictlyAscending(string n)
+    {
+        for (int i = 0; i < n.Length - 1; i++)
+            if (n[i + 1] <= n[i])
                 return false;
+
+        return true;
+    }
+
+    private static string RemoveDigit(string n, int d)
+    {
+        return n.Substring(0, d) + n.Substring(d + 1);
+    }
+
+    public static int[] LucasNumbersUpTo(int upper)
+    {
+        List<int> numbers = new List<int> { 2 };
+        int sumOfLastTwo = 1;
+        do
+        {
+            numbers.Add(sumOfLastTwo);
+            sumOfLastTwo = numbers[numbers.Count - 1] + numbers[numbers.Count - 2];
         }
+        while (sumOfLastTwo <= upper);
+
+        return numbers.ToArray();
+    }
+
+    public static bool IsDecomposableInto(string n, string[] parts)
+    {
+        Queue<string> compositions = new Queue<string>();
+        compositions.Enqueue("");
+
+        while (compositions.Count > 0)
+        {
+            string item = compositions.Dequeue();
+            foreach (string part in parts)
+            {
+                string newComposition = item + part;
+                if (newComposition == n)
+                    return true;
+
+                if (newComposition.Length < n.Length && PartialEquals(newComposition, n))
+                    compositions.Enqueue(newComposition);
+            }
+        }
+
         return false;
+    }
+
+    private static bool PartialEquals(string s1, string s2)
+    {
+        for (int i = 0; i < Math.Min(s1.Length, s2.Length); i++)
+            if (s1[i] != s2[i])
+                return false;
+
+        return true;
     }
 
 #pragma warning disable 414
@@ -255,15 +325,15 @@ public class countToFunnyScript : MonoBehaviour
     {
         yield return null;
         command = command.ToLowerInvariant();
-        if (Regex.IsMatch(command, @"^enter\s(0|1|2|3|4|5|6|7|8|9)?(0|1|2|3|4|5|6|7|8|9)?(0|1|2|3|4|5|6|7|8|9)?(0|1|2|3|4|5|6|7|8|9)$"))
+        if (Regex.IsMatch(command, @"^enter\s\d{1,5}$"))
         {
-            MatchCollection matches = Regex.Matches(command, @"(0|1|2|3|4|5|6|7|8|9)?(0|1|2|3|4|5|6|7|8|9)?(0|1|2|3|4|5|6|7|8|9)?(0|1|2|3|4|5|6|7|8|9)");
+            MatchCollection matches = Regex.Matches(command, @"\s(\d+)$");
             foreach (Match match in matches)
             {
                 Debug.Log(match.ToString());
                 string subcmd = match.ToString();
-                subcmd = (int.Parse(subcmd)).ToString("0000");
-                for (int i = 0; i < 4; i++)
+                subcmd = (int.Parse(subcmd)).ToString("00000");
+                for (int i = 0; i < 5; i++)
                 {
                     Buttons[subcmd[i] - '0'].OnInteract();
                     yield return null;
@@ -279,13 +349,13 @@ public class countToFunnyScript : MonoBehaviour
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        while (!solved)
+        while (!_solved)
         {
-            string cmd = solution[numbers.Count()].ToString("0000");
-            for (int i = 0; i < 4; i++)
+            string cmd = _solution[_numbers.Count()].ToString("00000");
+            for (int i = 0; i < 5; i++)
             {
                 Buttons[cmd[i] - '0'].OnInteract();
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.05f);
             }
             Buttons[10].OnInteract();
             yield return new WaitForSeconds(0.1f);

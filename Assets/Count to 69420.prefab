@@ -2519,7 +2519,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1846698370693070}
-  m_Text: "<b>ONLINE-3</b>\n\n <color='#3F3FBF'>Obvious</color>\n><color='#577D26'>meh</color>\n
+  m_Text: "<b>ONLINE-3</b>\n\n <color='#9080ff'>Obvious</color>\n><color='#577D26'>meh</color>\n
     <color='#002ABA'>Lord Kabe..</color>"
   m_OffsetZ: 0
   m_CharacterSize: 0.0008
@@ -2772,6 +2772,7 @@ MonoBehaviour:
   - {fileID: 114114291802796760}
   - {fileID: 114998841961931904}
   - {fileID: 114786640597964346}
+  - {fileID: 114388214006857332}
   - {fileID: 114388214006857332}
   Text:
   - {fileID: 102307281800166154}
@@ -3275,7 +3276,7 @@ MonoBehaviour:
   - {fileID: 114786640597964346}
   - {fileID: 114388214006857332}
   IsPassThrough: 0
-  ChildRowLength: 0
+  ChildRowLength: 6
   Highlight: {fileID: 114097489684032224}
   SelectableColliders: []
   DefaultSelectableIndex: 0
