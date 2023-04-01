@@ -46,8 +46,9 @@ public class CountToFunnyScript : MonoBehaviour
     private static readonly User[] _users =
     {
         new User("Rdzanu", "FFC000", 731, number => number.ToString().Count(x => "47".Contains(x)) % 2 == 1),
-        new User("AnAverageArceus", "F0D149", 366, number => DistinctPrimeCount(number) % 2 == 1),
+        new User("AnAverageArceus", "F0D149", 493, number => Enumerable.Range(0, number.ToString().Length - 1).Any(x => Enumerable.Range(x + 1, number.ToString().Length - x - 2).Any(y => number.ToString().Substring(x, 2) == number.ToString().Substring(y, 2)))),
         new User("meh", "577D26", 243, number => IsPerfectPower(number)),
+        new User("Depresso", "38F3AB", 788, number => Enumerable.Range(0, 10).All(x => number.ToString().Count(y => y - '0' == x) != 2)),
         new User("BomberJack", "00BFBA", 394, number => number.ToString().Distinct().Count() <= 2),
         new User("Asmir", "00FFFF", 818, number => Enumerable.Range(0, number.ToString().Length - 1).All(x => LowHighParityOdd(number.ToString(), x, x + 1))),
         new User("Eltrick", "308BBE", 956, number => number.ToString().Count(x => "069".Contains(x)) % 2 == 0),
@@ -61,6 +62,7 @@ public class CountToFunnyScript : MonoBehaviour
         new User("Shadow Meow", "9400D3", 808, number => number % 10 == 7 || number % 7 == 0),
         new User("tandyCake", "FF8AFF", 407, number => DigitDifference(number.ToString(), 0, 1) == DigitDifference(number.ToString(), number.ToString().Length - 2, number.ToString().Length - 1)),
         new User("Dicey", "ff40D0", 679, number => number % 3 == 0),
+        new User("Person", "630005", 666, number => Mathf.RoundToInt(Mathf.Sqrt(number) * 100).ToString().Contains('6')),
     };
 
     private int input;
@@ -213,19 +215,6 @@ public class CountToFunnyScript : MonoBehaviour
                 button.GetComponentInChildren<TextMesh>().text = "";
             }
         }
-    }
-
-    private static int DistinctPrimeCount(int n)
-    {
-        int j = 0;
-        for (int i = 2; i <= n; i++)
-            if (n % i == 0)
-            {
-                j++;
-                while (n % i == 0)
-                    n /= i;
-            }
-        return j;
     }
 
     private static bool IsPerfectPower(int n)
