@@ -330,7 +330,6 @@ public class CountToFunnyScript : MonoBehaviour
                 Buttons[10].OnInteract();
                 yield return null;
             }
-            yield return "solve";
         }
         else
             yield return "sendtochaterror Invalid command.";
@@ -341,11 +340,18 @@ public class CountToFunnyScript : MonoBehaviour
         while (!_solved)
         {
             string cmd = _solution[_numbers.Count()].ToString("00000");
-            for (int i = 0; i < 5; i++)
-            {
-                Buttons[cmd[i] - '0'].OnInteract();
-                yield return new WaitForSeconds(0.05f);
-            }
+
+            for (int i = 0; i <= 5; i++)
+                if(cmd.StartsWith(input.ToString("00000").Substring(i)))
+                {
+                    for (int j = 5 - i; j < 5; j++)
+                    {
+                        Buttons[cmd[j] - '0'].OnInteract();
+                        yield return new WaitForSeconds(0.05f);
+                    }
+                    break;
+                }
+
             Buttons[10].OnInteract();
             yield return new WaitForSeconds(0.1f);
         }
