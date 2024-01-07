@@ -55,7 +55,7 @@ public class CountToFunnyScript : MonoBehaviour
         new User("gwendolyn", "0080FF", 597, number => Enumerable.Range(0, number.ToString().Length).Any(x => IsStrictlyAscending(RemoveDigit(number.ToString(), x)))),
         new User("GhostSalt", "EAEBEC", 614, number => number % 16 >= 8),
         new User("Lord Kabewm", "002ABA", 234, number => ((number + 8) % 9 + 1) % 2 == 0),
-        new User("Cooldoom5", "000001", 248, number => IsDecomposableInto(number.ToString(), LucasNumbersUpTo(number).Select(x => x.ToString()).ToArray())),
+        new User("MaddyMoos", "000001", 248, number => IsDecomposableInto(number.ToString(), LucasNumbersUpTo(number).Select(x => x.ToString()).ToArray())),
         new User("Danielstigman", "1F1E33", 727, number => number.ToString().All(x => number.ToString().All(y => y % 2 == x % 2))),
         new User("Obvious", "9080C0", 383, number => number % 2 == 1),
         new User("MásQuéÉlite", "7700FF", 633, number => BaseDigitCount(number, 3, 2) % 2 == 0),
