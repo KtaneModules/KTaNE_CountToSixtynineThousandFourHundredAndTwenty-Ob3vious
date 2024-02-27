@@ -59,7 +59,7 @@ public class CountToFunnyScript : MonoBehaviour
         new User("Danielstigman", "1F1E33", 727, number => number.ToString().All(x => number.ToString().All(y => y % 2 == x % 2))),
         new User("Obvious", "9080C0", 383, number => number % 2 == 1),
         new User("MásQuéÉlite", "7700FF", 633, number => BaseDigitCount(number, 3, 2) % 2 == 0),
-        new User("Shadow Meow", "9400D3", 808, number => number % 10 == 7 || number % 7 == 0),
+        new User("Umbra Moruka", "9400D3", 808, number => number % 10 == 7 || number % 7 == 0),
         new User("tandyCake", "FF8AFF", 407, number => DigitDifference(number.ToString(), 0, 1) == DigitDifference(number.ToString(), number.ToString().Length - 2, number.ToString().Length - 1)),
         new User("Dicey", "ff40D0", 679, number => number % 3 == 0),
         new User("Person", "630005", 666, number => Mathf.RoundToInt(Mathf.Sqrt(number) * 100).ToString().Contains('6')),
